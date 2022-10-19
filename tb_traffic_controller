@@ -1,0 +1,68 @@
+`timescale 1ns / 1ps
+
+module tb_traffi_controller;
+
+	// Inputs
+	reg clk;
+	reg rst_a;
+	reg x1;
+	reg x2;
+	reg x3;
+	reg x4;
+
+	// Outputs
+	wire [2:0] n_lights;
+	wire [2:0] s_lights;
+	wire [2:0] e_lights;
+	wire [2:0] w_lights;
+
+   // clock generation
+	initial clk=1;
+	always@(clk) #10 clk<=~clk;
+	
+	// Instantiate the Unit Under Test (UUT)
+	traffic_control uut (
+		.n_lights(n_lights), 
+		.s_lights(s_lights), 
+		.e_lights(e_lights), 
+		.w_lights(w_lights), 
+		.clk(clk), 
+		.rst_a(rst_a), 
+		.x1(x1), 
+		.x2(x2), 
+		.x3(x3), 
+		.x4(x4)
+	);
+	
+	task initialize;
+	begin
+	 @(negedge clk)
+	  rst_a =0;
+	  {x1,x2,x3,x4}=0;  
+	end
+	endtask
+	
+	task reset;
+	begin
+	
+	@(negedge clk)
+	rst_a <=1'b1;
+	@(negedge clk)
+	rst_a <=1'b0;
+	
+	end
+	endtask
+	
+
+	initial begin
+	 reset;
+    initialize;	 
+    
+	 #120 {x1,x2,x3,x4}=4'b1000;
+	 #120 {x1,x2,x3,x4}=4'b0100;
+	 #500 {x1,x2,x3,x4}=4'b0110;
+	 #500 {x1,x2,x3,x4}=4'b0111;
+	end
+      
+endmodule
+
